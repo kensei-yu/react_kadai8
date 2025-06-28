@@ -1,25 +1,28 @@
 import React, { useState } from 'react';
 
-// 各項目の文字数上限を定数として定義します。
 const MAX_LENGTH = {
   name: 20,
   email: 50,
   comment: 200,
 };
 
-const FormApp2 = () => {
-  // フォームの入力値を管理するstate
-  const [formData, setFormData] = useState({
-    name: '',
-    email: '',
-    comment: '',
-  });
+// フォームの初期状態を定義した定数
+const INITIAL_FORM_STATE = {
+  name: '',
+  email: '',
+  comment: '',
+};
+
+const FormApp3 = () => {
+  // 現在のフォーム入力値を管理するstate
+  const [formData, setFormData] = useState(INITIAL_FORM_STATE);
+
+  // 保存されたフォームデータの一覧を管理するstate。初期値は空の配列[]です。
+  const [savedDataList, setSavedDataList] = useState([]);
 
   // 入力値が変更されたときに呼び出される関数
   const handleChange = (event) => {
     const { name, value } = event.target;
-
-    // 入力値が上限文字数を超えないように制限します。
     if (value.length <= MAX_LENGTH[name]) {
       setFormData(prevFormData => ({
         ...prevFormData,
@@ -28,24 +31,22 @@ const FormApp2 = () => {
     }
   };
 
+  // 保存ボタンがクリックされたときに呼び出される関数
+  const handleSave = () => {
+    // 現在のformDataをsavedDataListの配列に追加します。
+    // スプレッド構文(...)を使って、既存のリストの末尾に新しいデータを追加した新しい配列を作成します。
+    setSavedDataList(prevList => [...prevList, formData]);
+    
+    // フォームの入力内容を初期状態にリセットします。
+    setFormData(INITIAL_FORM_STATE);
+  };
+
   return (
     <div>
-      {/* ===== 表示部分 ===== */}
+      {/* ===== フォーム部分と現在の入力内容 ===== */}
       <div style={{ marginBottom: '20px', padding: '10px', border: '1px solid #ccc' }}>
-        <h2>入力内容の表示</h2>
-        {/* 三項演算子 `(条件 ? trueの場合 : falseの場合)` を使用しています。
-          formData.nameが存在すれば（空文字でなければ）その値を表示し、
-          存在しなければ "未入力です" と表示します。
-        */}
-        <p><strong>名前:</strong> {formData.name || '未入力です'}</p>
-        <p><strong>メール:</strong> {formData.email || '未入力です'}</p>
-        <p><strong>コメント:</strong> {formData.comment || '未入力です'}</p>
-      </div>
-
-      {/* ===== フォーム部分 ===== */}
-      <div style={{ padding: '10px', border: '1px solid #ccc' }}>
         <h2>入力フォーム</h2>
-        {/* 名前入力フィールド */}
+        {/* 名前 */}
         <div>
           <label>名前: </label>
           <input
@@ -53,16 +54,14 @@ const FormApp2 = () => {
             name="name"
             value={formData.name}
             onChange={handleChange}
-            // HTMLの属性で文字数上限を設定することもできますが、今回はJSで制御しています。
             maxLength={MAX_LENGTH.name}
             placeholder="山田 太郎"
           />
-          {/* 現在の文字数と上限文字数を表示します。 */}
           <span style={{ marginLeft: '10px' }}>
             {formData.name.length} / {MAX_LENGTH.name}
           </span>
         </div>
-        {/* メール入力フィールド */}
+        {/* メール */}
         <div style={{ marginTop: '10px' }}>
           <label>メール: </label>
           <input
@@ -77,7 +76,7 @@ const FormApp2 = () => {
             {formData.email.length} / {MAX_LENGTH.email}
           </span>
         </div>
-        {/* コメント入力フィールド */}
+        {/* コメント */}
         <div style={{ marginTop: '10px' }}>
           <label>コメント: </label>
           <textarea
@@ -87,13 +86,40 @@ const FormApp2 = () => {
             maxLength={MAX_LENGTH.comment}
             placeholder="ご意見・ご感想"
           />
-          <span style={{ marginLeft: '10px' }}>
+           <span style={{ marginLeft: '10px' }}>
             {formData.comment.length} / {MAX_LENGTH.comment}
           </span>
         </div>
+        {/* 保存ボタン */}
+        <div style={{ marginTop: '20px' }}>
+          <button onClick={handleSave}>保存</button>
+        </div>
+      </div>
+
+      {/* ===== 保存したもの一覧 ===== */}
+      <div style={{ padding: '10px', border: '1px solid #ccc' }}>
+        <h2>保存したもの一覧</h2>
+        {/* savedDataListが空の場合はメッセージを表示 */}
+        {savedDataList.length === 0 ? (
+          <p>まだ保存されたデータはありません。</p>
+        ) : (
+          // savedDataListにデータがある場合は、リスト形式で表示
+          // .map()関数を使って、配列の各要素を順番に取り出し、JSXの要素に変換します。
+          // `item`には各保存データ(オブジェクト)、`index`にはその要素番号が入ります。
+          // Reactでリストを表示する際は、各要素を区別するためにユニークな`key`属性が必要です。
+          <ul>
+            {savedDataList.map((item, index) => (
+              <li key={index} style={{ marginBottom: '10px', padding: '5px', borderBottom: '1px solid #eee' }}>
+                <p><strong>名前:</strong> {item.name || '未入力'}</p>
+                <p><strong>メール:</strong> {item.email || '未入力'}</p>
+                <p><strong>コメント:</strong> {item.comment || '未入力'}</p>
+              </li>
+            ))}
+          </ul>
+        )}
       </div>
     </div>
   );
 };
 
-export default FormApp2;
+export default FormApp3;
