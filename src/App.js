@@ -1,45 +1,79 @@
-// ReactからuseStateフックをインポートします。useStateは、コンポーネント内で状態（データ）を管理するために使用します。
+// ReactからuseStateフックをインポートします。
 import React, { useState } from 'react';
 
 // FormAppコンポーネントを定義します。
-const FormAppMin = () => {
-  // useStateを使って、入力値を保持するための状態変数`inputValue`と、それを更新するための関数`setInputValue`を宣言します。
-  // 初期値は空文字''です。
-  const [inputValue, setInputValue] = useState('');
+const FormApp1 = () => {
+  // useStateを使って、フォーム全体の入力値をオブジェクトとして管理します。
+  // 各プロパティ（name, email, comment）がそれぞれの入力フィールドに対応します。
+  const [formData, setFormData] = useState({
+    name: '',
+    email: '',
+    comment: '',
+  });
 
-  // テキストボックスの入力値が変更されるたびに呼び出される関数です。
+  // いずれかの入力フィールドの値が変更されたときに呼び出される関数です。
   const handleChange = (event) => {
-    // event.target.valueには、入力された最新のテキストが入っています。
-    // setInputValue関数を使って、inputValueの状態を更新します。これにより、コンポーネントが再レンダリングされます。
-    setInputValue(event.target.value);
+    // event.targetから、どの入力フィールド（name）が、どの値（value）に変更されたかを取得します。
+    const { name, value } = event.target;
+
+    // setFormDataを呼び出して、状態を更新します。
+    // スプレッド構文(...)を使って既存のformDataオブジェクトを展開し、
+    // 変更があったプロパティ（例: name）だけを新しい値（value）で上書きします。
+    setFormData(prevFormData => ({
+      ...prevFormData,
+      [name]: value,
+    }));
   };
 
-  // コンポーネントが画面に表示する内容（JSX）を返します。
   return (
     <div>
       {/* ===== 表示部分 ===== */}
       <div style={{ marginBottom: '20px', padding: '10px', border: '1px solid #ccc' }}>
         <h2>入力内容の表示</h2>
-        {/* inputValueの状態を画面に表示します。 */}
-        <p>{inputValue}</p>
+        <p><strong>名前:</strong> {formData.name}</p>
+        <p><strong>メール:</strong> {formData.email}</p>
+        <p><strong>コメント:</strong> {formData.comment}</p>
       </div>
 
       {/* ===== フォーム部分 ===== */}
       <div style={{ padding: '10px', border: '1px solid #ccc' }}>
         <h2>入力フォーム</h2>
-        {/* テキスト入力ボックスです。 */}
-        <input
-          type="text"
-          // value属性にinputValue状態を紐付けます。
-          value={inputValue}
-          // onChangeイベントにhandleChange関数を紐付け、入力があるたびに呼び出されるようにします。
-          onChange={handleChange}
-          placeholder="文字を入力してください"
-        />
+        {/* 名前入力フィールド */}
+        <div>
+          <label>名前: </label>
+          <input
+            type="text"
+            // `name`属性は、どのデータを更新するかを識別するために重要です。
+            name="name"
+            value={formData.name}
+            onChange={handleChange}
+            placeholder="山田 太郎"
+          />
+        </div>
+        {/* メール入力フィールド */}
+        <div style={{ marginTop: '10px' }}>
+          <label>メール: </label>
+          <input
+            type="email"
+            name="email"
+            value={formData.email}
+            onChange={handleChange}
+            placeholder="example@test.com"
+          />
+        </div>
+        {/* コメント入力フィールド */}
+        <div style={{ marginTop: '10px' }}>
+          <label>コメント: </label>
+          <textarea
+            name="comment"
+            value={formData.comment}
+            onChange={handleChange}
+            placeholder="ご意見・ご感想"
+          />
+        </div>
       </div>
     </div>
   );
 };
 
-// このコンポーネントを他のファイルで使えるようにエクスポートします。
-export default FormAppMin;
+export default FormApp1;
